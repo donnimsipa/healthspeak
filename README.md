@@ -2,19 +2,19 @@
 
 ## Why HealthSpeak AI?
 
-Are you frustrated with navigating complex menus and typing tedious search queries just to find a patient's laboratory results? Healthcare providers and patients alike often face this challenge, leading to wasted time and miscommunication. HealthSpeak AI was created to eliminate these barriers by offering a simple conversational interface that instantly retrieves and clearly explains exact lab results, removing the hassle of manual searching.
+Finding a lab value should not require digging through EMRs. HealthSpeak AI gives patients and staff a conversational way to pull exact results instantly, reducing effort and miscommunication.
 
 ***
 
 ## Story
 
-HealthSpeak AI began as a solution to a common pain point in healthcare: accessing and understanding lab data quickly and accurately. Instead of overwhelming users with complex interfaces or ambiguous interpretations, this system uses generative AI to quote exact lab values directly from electronic medical records. By leveraging an orchestrated workflow on Google Cloud Run, Firestore, and Google Gemini AI, HealthSpeak AI delivers precise, trustworthy data in natural language — empowering patients and healthcare professionals to communicate lab results effortlessly.
+HealthSpeak AI addresses the pain of accessing lab data quickly. Instead of complex interfaces or ambiguous interpretations, it quotes exact values from medical records using an orchestrated workflow on Google Cloud Run, Firestore, and Google Gemini AI. The result is fast, trustworthy responses for patients and clinicians.
 
 ***
 
 ## Overview
 
-HealthSpeak AI is a patient-facing conversational assistant designed to help users understand their laboratory test results through natural language queries. The system provides exact lab values directly quoted from electronic medical record data, without interpretation or medical advice.
+HealthSpeak AI is a conversational assistant that returns exact lab values from medical records in response to natural language questions—without interpretation or advice.
 
 ### Key Features
 
@@ -28,11 +28,11 @@ HealthSpeak AI is a patient-facing conversational assistant designed to help use
 
 ## How It Works
 
-1. User sends a question to the chat interface.
-2. The workflow triggers the AI Agent node which fetches patient lab data from Firestore.
-3. AI Agent constructs a prompt following strict rules and sends it to Gemini AI.
-4. Gemini returns a clear, exact quote of lab results, formatted as single lines or numbered lists depending on query scope.
-5. The system displays the response in a user-friendly format.
+1) User asks a question in chat.  
+2) n8n workflow triggers the AI Agent.  
+3) Agent fetches lab data from Firestore and injects it into the prompt with guardrails.  
+4) Gemini returns quoted results (single line or numbered list).  
+5) Response is sent back to the user.
 
 ***
 
@@ -41,6 +41,39 @@ HealthSpeak AI is a patient-facing conversational assistant designed to help use
 - Focused exclusively on data quoting; no clinical interpretation or recommendations.
 - Demo version assumes single-patient context without user authentication.
 - Planned expansions include multi-patient support, patient authentication, and multilingual capabilities.
+
+## Architecture Diagram
+
+![HealthSpeak AI Diagram](Diagram.png)
+
+## HealthSpeak AI - Reference Architecture Context
+
+### Core Architecture Summary
+AI-powered patient chatbot on Google Cloud Run with Firestore as the source of truth for lab data.
+
+### Layers at a Glance
+- **Application:** n8n workflow on Cloud Run; chat trigger as the entry point.  
+- **Orchestration:** n8n AI Agent with system guardrails enforcing quote-only responses.  
+- **Data:** Firestore `healthspeak/patients/lab_results` JSON (e.g., `"HbA1c": "5.8% (Jul 6, 2025)"`).  
+- **AI:** Google Gemini with RAG-style context injection from Firestore; safety prompts for HIPAA compliance.  
+- **Ops:** Cloud Run autoscaling; n8n background jobs; managed via Google Cloud Console.  
+- **Future Expansion:** Cloud Storage for documents; BigQuery for analytics.
+
+### End-to-End Flow
+```
+Patient query ("What is my HbA1c?")
+    ↓ chat trigger (Cloud Run)
+AI Agent → Firestore lookup (lab_results)
+    ↓ prompt with guardrails + Firestore context
+Gemini returns quoted result
+    ↓
+Response to user: "HbA1c: 5.8% (Jul 6, 2025) from your medical records."
+```
+
+### Key Benefits
+- Serverless and scalable (autoscale without infra management)
+- HIPAA-safe framing: quote-only, no advice
+- Cost-effective pay-per-use
 
 ## Project Artifacts
 
@@ -53,4 +86,4 @@ HealthSpeak AI is a patient-facing conversational assistant designed to help use
 - [User Acceptance Test (UAT)](UAT.md)
 - [Deployment Plan](Deployment%20Plan.md)
 - [User Manual](User%20Manual.md)
-- [Maintenance Plan](Maintenance%20Plan.md)
+- [Maintenance Plan](MaintenancevPlan.md)
