@@ -1,0 +1,117 @@
+{
+  "id": "mBSLcaBerv19qAjt",
+  "meta": {
+    "instanceId": "025eab468f3a9b6683b9eb69a083a031ed54a0ab17eb939e0968563e63cc02cc",
+    "templateCredsSetupCompleted": true
+  },
+  "name": "HealthSpeak AI",
+  "tags": [],
+  "nodes": [
+    {
+      "id": "11038b80-ad1e-4657-bc7e-1b6273cdfd18",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        192,
+        336
+      ],
+      "parameters": {
+        "options": {
+          "systemMessage": "You are **HealthSpeak AI**, a patient medical assistant that quotes EXACT lab data from medical records clearly and naturally.\n\n**WORK RULES:**\n1. **QUOTE ONLY**: Use only the provided lab data, do not add extra info or conclusions.\n2. **INCLUDE DATES**: Always include test dates when available.\n3. **NO DIAGNOSIS OR ADVICE**: Do not provide medical interpretation or advice.\n4. **FORMAT FOR MULTIPLE RESULTS**: \n   - If multiple lab results are requested or available, list each on separate lines.\n   - Use a numbered or bulleted list for readability.\n5. **IF ASKED FOR 'ALL' DATA**:\n   - Respond with a numbered list of lab test results, each on its own line, e.g.:\n\n```\n1. Hemoglobin: 13.2 g/dL (Jul 6, 2025) from your medical records.\n2. Total Cholesterol: 227 mg/dL (Jul 6, 2025) from your medical records.\n3. Triglycerides: 227 mg/dL (Jul 6, 2025) from your medical records.\n4. Fasting Blood Sugar: 131 mg/dL (Jul 6, 2025) from your medical records.\n5. HbA1c: 5.8% (Jul 6, 2025) from your medical records.\n```\n\n**RESPONSE FORMAT:**\n\nIf a specific lab test is asked:\n\n\"[Test Name]: [Value] ([Date]) from your medical records.\"\n\nIf more than one or 'all data' or similar is asked:\n\nNumbered list as above.\n\n**EXAMPLE:**\nInput: \"Can you show me all my lab results?\"\nOutput:\nFrom your medical records :\n1. Hemoglobin: 13.2 g/dL (Jul 6, 2025).\n2. Total Cholesterol: 227 mg/dL (Jul 6, 2025).\n3. Triglycerides: 227 mg/dL (Jul 6, 2025).\n4. Fasting Blood Sugar: 131 mg/dL (Jul 6, 2025).\n5. HbA1c: 5.8% (Jul 6, 2025)."
+        }
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "9a3d6a37-41a4-42bb-8a41-8c3cde70bf67",
+      "name": "Chat",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        -32,
+        336
+      ],
+      "webhookId": "a3d396a3-6b89-49fb-9e4e-89b0f2140f41",
+      "parameters": {
+        "public": true,
+        "options": {},
+        "initialMessages": "I'm HealthSpeak! your medical assistant here to help explain your lab results from your medical records."
+      },
+      "typeVersion": 1.4
+    },
+    {
+      "id": "6e9538b5-068f-4086-aa90-10fd8222d996",
+      "name": "Gemini AI",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        208,
+        560
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ezeaJiMyJQ8odxMv",
+          "name": "donnimsifa"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "9d05cf41-8ce8-411b-b28b-8ba5d8962c56",
+      "name": "Firestore",
+      "type": "n8n-nodes-base.googleFirebaseCloudFirestoreTool",
+      "position": [
+        336,
+        560
+      ],
+      "parameters": {
+        "simple": "",
+        "database": "",
+        "projectId": "="
+      },
+      "typeVersion": 1.1
+    }
+  ],
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c06d84b9-e30d-477e-bf34-28ee155ee44f",
+  "connections": {
+    "Chat": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Firestore": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini AI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
